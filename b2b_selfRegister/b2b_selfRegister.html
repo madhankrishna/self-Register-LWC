@@ -1,0 +1,94 @@
+<template>
+    <lightning-spinner
+        class="slds-is-fixed slds-align_absolute-center"
+        if:true={showSpinner}
+        alternative-text="Loading..."
+        size="medium"
+        variant="brand"
+
+    ></lightning-spinner>
+
+
+    <!-- lightning button for open modal window -->
+    <div class="sign-Up">
+        <p>Or Sign Up Using</p>
+        <lightning-button variant="brand" label="Sign Up" title="Create User" onclick={openModal}
+            class="slds-m-left_x-small">
+        </lightning-button>
+    </div>
+    
+    <!--Use template if:true to display/hide popup based on isModalOpen value-->
+    <template if:true={isModalOpen}>
+        
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse"
+                            size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"> Create Account</h2>
+                    <img src="https://i.postimg.cc/BZ2BbSfq/Png-Item-723677.png" alt="" srcset="" width="71px">
+                    
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="container-fluid">
+                        <div class="form-group slds-m-bottom_medium slds-input-has-icon slds-input-has-icon_left">
+                            <lightning-icon class="input-icon" icon-name="utility:user" alternative-text="username" size="xx-small"></lightning-icon>
+                            <lightning-input class="custom-input-class" data-field='FirstName' label='First Name'
+                                required type="text" placeholder="Enter Fisrt Name"></lightning-input>
+                        </div>
+                        <div class="form-group slds-m-bottom_medium slds-input-has-icon slds-input-has-icon_left">
+                            <lightning-icon class="input-icon" icon-name="utility:user" alternative-text="username" size="xx-small"></lightning-icon>
+                            <lightning-input class="custom-input-class" data-field='LastName' label='Last Name'
+                                required type="text" placeholder="Enter Last Name"></lightning-input>
+                        </div>
+                        <div class="form-group slds-m-bottom_medium slds-input-has-icon slds-input-has-icon_left">
+                            <lightning-icon class="input-icon" icon-name="utility:company" alternative-text="username" size="xx-small"></lightning-icon>
+                            <lightning-input class="custom-input-class" data-field='Company' label="Company"
+                                required type="text" placeholder="Enter Company Name"></lightning-input>
+                        </div>
+                        <div class="form-group slds-m-bottom_medium slds-input-has-icon slds-input-has-icon_left">
+                            <lightning-icon class="input-icon" icon-name="utility:email" alternative-text="username" size="xx-small"></lightning-icon>
+                            <lightning-input type="email" label="Email" class="custom-input-class" data-field='Email' required placeholder="example@email.com"> </lightning-input>
+                        </div>
+                        <div class="form-group slds-m-bottom_medium slds-input-has-icon slds-input-has-icon_left">
+                            <lightning-icon class="input-icon" icon-name="utility:phone_portrait" alternative-text="username" size="xx-small"></lightning-icon>
+                            <lightning-input data-field='Phone' label="Phone" required type="tel" placeholder="Enter Phone Number"></lightning-input>
+                        </div>
+                        <div class="form-group slds-m-bottom_medium slds-input-has-icon slds-input-has-icon_left">
+                            <lightning-icon class="input-icon" icon-name="utility:password" alternative-text="username" size="xx-small"></lightning-icon>
+                            <lightning-input class="custom-input-class" data-field='Password' label="Password"
+                                required type="password" placeholder="Enter Password(Test@123)"  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"></lightning-input>
+                        </div>
+                        <div class="form-group slds-m-bottom_medium slds-input-has-icon slds-input-has-icon_left">
+                            <lightning-icon class="input-icon" icon-name="utility:password" alternative-text="username" size="xx-small"></lightning-icon>
+                            <lightning-input class="custom-input-class" data-field='Confrim_Password' label='Confrim Password'
+                                required type="password" placeholder="Confrim Password"></lightning-input>
+                        </div>
+                        <div if:true={isPasswordMatched} style="color:#d01f25;">
+                            <p>{missMatchPasswordErrorMsg}</p>
+                        </div>
+                        &nbsp;
+                        <div if:true={showError} style="color:#d01f25;">
+                            <p>{errorMsg}</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick={submitDetails} title="Create User" onsuccess={closeModal}>Create
+                        User</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

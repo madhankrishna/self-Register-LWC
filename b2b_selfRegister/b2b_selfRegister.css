@@ -1,0 +1,25 @@
+.sign-Up{
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    /* align-content: center; */
+    flex-direction: column;
+}
+.sign-Up p{
+    margin-bottom: 10px;
+    color: whitesmoke;
+}
+.slds-modal__header{
+    display: flex;
+    justify-content: space-evenly;
+}
+.input-icon{
+    z-index: 111;
+    position: absolute;
+    top: 25px;
+    left: 10px;
+}
+.slds-input{
+    padding: 5px 30px;
+
+}
