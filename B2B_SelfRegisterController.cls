@@ -1,6 +1,13 @@
 public without sharing class B2B_SelfRegisterController {
     public B2B_SelfRegisterController() {}
-    
+
+    private static final String IS_EMAIL_EXIST = 'isEmailExist';
+    private static final String IS_PHONE_NUMBER_EXITS = 'isPhoneNumberExits';
+    private static final String B2B_COMMERCE_BUYER = 'B2B_Commerce_Buyer';
+    private static final String HERO_CYCLES_BUYER_GROUP = 'HeroCycles Buyer Group';
+    private static final String URL = 'url';
+
+
     @AuraEnabled
     public static Map<String,Object> registerUser(String firstName, String lastName, String username, String email, String communityNickname, String password, string AccountName,string PhoneNumber){
         try {
@@ -12,11 +19,11 @@ public without sharing class B2B_SelfRegisterController {
 
             if(!userList.isEmpty()){
                 //if email was there
-                resp.put('isEmailExist', true);
+                resp.put(IS_EMAIL_EXIST, true);
                 return resp;
             }
             else if(!accList.isEmpty()){
-                resp.put('isPhoneNumberExits', true);
+                resp.put(IS_PHONE_NUMBER_EXITS, true);
                 return resp;
             }
             else{
@@ -57,12 +64,12 @@ public without sharing class B2B_SelfRegisterController {
                 if (userId != null) {
                     if (password != null && password.length() > 1) {
                         List<String> listOfPermissions = new List<String>{
-                            'B2B_Commerce_Buyer'
+                            B2B_COMMERCE_BUYER
                         };
                         insertCommunityUserPermissionSet(userId, listOfPermissions);
-                        ApexPages.PageReference pageRef = Site.login(username, password, 'https://training202104--mkrishna.sandbox.my.site.com/HeroCycles/s');
+                        ApexPages.PageReference pageRef = Site.login(username, password, null);
                         if(pageRef != null) {
-                            resp.put('url',pageRef.getUrl());
+                            resp.put(URL,pageRef.getUrl());
                             return resp;
                         }
                             
@@ -71,10 +78,7 @@ public without sharing class B2B_SelfRegisterController {
                 return resp;
             }
         } catch (Exception e) {
-            system.debug('e.getMessage+   '+e.getMessage());
-            throw new AuraHandledException(e.getMessage());
-            
-            
+            throw new AuraHandledException(e.getMessage()); 
         }
     }
 
@@ -86,13 +90,14 @@ public without sharing class B2B_SelfRegisterController {
 
         insert buyerAccount;
 
-        BuyerGroup buyerGroupID = [select id,Name from BuyerGroup where name = 'HeroCycles Buyer Group'];
+        BuyerGroup buyerGroupID = [select id,Name from BuyerGroup where name =:HERO_CYCLES_BUYER_GROUP];
         BuyerGroupMember bgm = new BuyerGroupMember(
                 BuyerGroupId = buyerGroupID.Id,
                 BuyerId = a.Id
         );
         insert bgm;
     }
+
     @future
     public static void insertCommunityUserPermissionSet(String userId,List<String> listOfPermissionSet) {
     List<PermissionSet> PermissionSetList = [select id,name from PermissionSet  where name in : listOfPermissionSet];
