@@ -1,3 +1,10 @@
+/**
+* @description       : Contoller for slef register 
+* @author            : Madhan
+* @group             :
+* @last modified on  : 9.Dec.2022
+* @last modified by  : Madhan
+**/
 public without sharing class B2B_SelfRegisterController {
     public B2B_SelfRegisterController() {}
 
@@ -9,39 +16,33 @@ public without sharing class B2B_SelfRegisterController {
 
 
     @AuraEnabled
-    public static Map<String,Object> registerUser(String firstName, String lastName, String username, String email, String communityNickname, String password, string AccountName,string PhoneNumber){
+    public static Map<String,Object> registerUser(String firstName, String lastName, String userName, 
+                                                    String email, String communityNickname, String password, string AccountName,string PhoneNumber){
         try {
-
-            Map<String,Object> resp = new Map<String,Object>();
+            Map<String,Object> respMap = new Map<String,Object>();
 
             List<Account> accList = [Select Id, Name,Phone From Account Where Phone = :PhoneNumber];
             List<User> userList = [Select Id, Name From User Where Email = :email];
 
-            if(!userList.isEmpty()){
+            if(!userList.isEmpty()) {
                 //if email was there
-                resp.put(IS_EMAIL_EXIST, true);
-                return resp;
+                respMap.put(IS_EMAIL_EXIST, true);
             }
             else if(!accList.isEmpty()){
-                resp.put(IS_PHONE_NUMBER_EXITS, true);
-                return resp;
+                respMap.put(IS_PHONE_NUMBER_EXITS, true);
             }
             else{
-                String nickname = ((firstname != null && firstname.length() > 0) ? firstname.substring(0, 1) : '') + lastname.substring(0, 1);
-                nickname += String.valueOf(Crypto.getRandomInteger()).substring(1, 7);
+                String nickName = ((firstName != null && firstName.length() > 0) ? firstName.substring(0, 1) : '') + lastName.substring(0, 1);
+                nickName += String.valueOf(Crypto.getRandomInteger()).substring(1, 7);
 
                 User u = new User();
                 u.firstName = firstName;
                 u.lastName = lastName;
-                u.Username = username;
+                u.UserName = userName;
                 u.Email = email;
-                u.CommunityNickname = nickname; 
-                     
-    
-                String accountId;
-    
+                u.CommunityNickname = nickName; 
+
                 // create Account
-    
                 Account portalAccount = new Account();
                 portalAccount.Name = AccountName;
                 portalAccount.Phone = PhoneNumber;
@@ -51,15 +52,9 @@ public without sharing class B2B_SelfRegisterController {
                 update portalAccount;
     
                 //asign buyers
-    
-                setUpAccountAsBuyer(portalAccount);
-    
-                accountId = portalAccount.Id;
-                
-                // craete user 
-    
-                String userId = Site.createPortalUser(u, accountId, password,true);
-                system.debug(userId);
+                setUpAccountAsBuyer(portalAccount);                
+                // craete user
+                String userId = Site.createPortalUser(u, portalAccount.Id, password,true);
 
                 if (userId != null) {
                     if (password != null && password.length() > 1) {
@@ -67,16 +62,14 @@ public without sharing class B2B_SelfRegisterController {
                             B2B_COMMERCE_BUYER
                         };
                         insertCommunityUserPermissionSet(userId, listOfPermissions);
-                        ApexPages.PageReference pageRef = Site.login(username, password, null);
+                        ApexPages.PageReference pageRef = Site.login(userName, password, null);
                         if(pageRef != null) {
-                            resp.put(URL,pageRef.getUrl());
-                            return resp;
-                        }
-                            
+                            respMap.put(URL,pageRef.getUrl());
+                        }        
                     }
                 }
-                return resp;
             }
+            return respMap;
         } catch (Exception e) {
             throw new AuraHandledException(e.getMessage()); 
         }
@@ -90,7 +83,7 @@ public without sharing class B2B_SelfRegisterController {
 
         insert buyerAccount;
 
-        BuyerGroup buyerGroupID = [select id,Name from BuyerGroup where name =:HERO_CYCLES_BUYER_GROUP];
+        BuyerGroup buyerGroupID = [Select Id,Name From BuyerGroup Where Name = :HERO_CYCLES_BUYER_GROUP];
         BuyerGroupMember bgm = new BuyerGroupMember(
                 BuyerGroupId = buyerGroupID.Id,
                 BuyerId = a.Id
@@ -100,7 +93,7 @@ public without sharing class B2B_SelfRegisterController {
 
     @future
     public static void insertCommunityUserPermissionSet(String userId,List<String> listOfPermissionSet) {
-    List<PermissionSet> PermissionSetList = [select id,name from PermissionSet  where name in : listOfPermissionSet];
+    List<PermissionSet> PermissionSetList = [Select Id,Name From PermissionSet  Where Name in : listOfPermissionSet ];
     List<PermissionSetAssignment> pmaList = new List<PermissionSetAssignment>();
     for (PermissionSet rec : PermissionSetList) {
         PermissionSetAssignment permissionSetRec = new PermissionSetAssignment();
